@@ -52,16 +52,6 @@ local function Create_PrivImpl(DebugMode)
 
 			if obj ~= nil then
 				for k, v in pairs(data) do
-					if obj:IsA("LocalScript") then
-						if k == "Source" then
-							local ok, err = pcall(function()
-								loadstring(v)
-							end)
-							if not ok then
-								print(debug.traceback(err))
-							end
-						end
-					end
 					if type(k) == 'string' then
 						if k == "Parent" then
 							parent = v
