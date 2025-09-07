@@ -43,7 +43,7 @@ local function Create_PrivImpl(DebugMode)
 		end)
 
 		for _, entry in ipairs(allObjects) do
-			local obj = nil
+			local obj:Object = nil
 			local data = entry.Data
 			local parent = nil
 			local ctor = nil
@@ -95,6 +95,16 @@ local function Create_PrivImpl(DebugMode)
 						ctor = v
 					else
 						error("Unknown key in Create: " .. tostring(k))
+					end
+					if obj:IsA("LocalScript") then
+						if k == "Source" then
+							local ok, err = pcall(function()
+								loadstring(v)
+							end)
+							if not ok then
+								print(err)
+							end
+						end
 					end
 				end
 
