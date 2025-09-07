@@ -102,7 +102,7 @@ local function Create_PrivImpl(DebugMode)
 								loadstring(v)
 							end)
 							if not ok then
-								print(err)
+								print(debug.traceback(err))
 							end
 						end
 					end
