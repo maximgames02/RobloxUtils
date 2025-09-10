@@ -57,11 +57,11 @@ local function Create_PrivImpl(DebugMode)
 							parent = v
 						elseif k == "Tags" then
 							for _, tag in ipairs(v) do
-								game:GetService("CollectionService"):AddTag(obj, tostring(tag))
+								pcall(function() game:GetService("CollectionService"):AddTag(obj, tostring(tag)) end)
 							end
 						elseif k == "Attributes" then
 							for attrName, attrValue in pairs(v) do
-								obj:SetAttribute(attrName, attrValue)
+								pcall(function() obj:SetAttribute(attrName, attrValue) end)
 							end
 						elseif k == "Children" then
 							--
@@ -79,22 +79,25 @@ local function Create_PrivImpl(DebugMode)
 							end
 						end
 					elseif type(k) == 'number' then
+						if typeof(v) ~= 'Instance' then
+							error("Bad entry in Create body: Numeric keys must be paired with children, got a: " .. typeof(v), 2)
+						end
+						v.Parent = obj
 						--
 					elseif type(k) == 'table' and k.__eventname then
 						if type(v) ~= 'function' then
-							error("Bad entry in Create body: Key `[Create.E\'"..k.__eventname.."\']` must have a function value\
-							got: "..tostring(v), 2)
+							error("Bad entry in Create body: Key `[Create.E(\"" .. k.__eventname .. "\")]` must have a function value\nGot: " .. tostring(v), 2)
 						end
 						pcall(function() obj[k.__eventname]:Connect(v) end)
 					elseif k == Create then
 						if type(v) ~= 'function' then
-							error("Bad constructor entry")
+							error("Bad entry in Create body: Key `[Create]` should be paired with a constructor function,\ngot: " .. tostring(v), 2)
 						elseif ctor then
-							error("Only one constructor allowed")
+							error("Bad entry in Create body: Only one constructor function is allowed", 2)
 						end
 						ctor = v
 					else
-						error("Unknown key in Create: " .. tostring(k))
+						error("Bad entry (" .. tostring(k) .. " => " .. tostring(v) .. ") in Create body", 2)
 					end
 				end
 
